@@ -1,0 +1,120 @@
+名字：.link
+价格：.red.price
+成品：.quality.bold.gray3
+地址:  .text.user-place
+详细信息：.normal-text
+package csuft.xia.job.v2;
+
+import java.io.FileWriter;
+import java.util.ArrayList;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+/**
+ * 使用线程池进行并发访问
+ * 
+ * @author xia
+ *
+ */
+public class V2 {
+
+	public static void main(String[] args) {
+
+		// 主线程中执行
+		// 死循环
+//		while (true) {
+//			System.out.println("run");
+//		}
+
+		// 创建多个线程
+		// 创建一个线程池
+		// 线程数与核心数的关系？
+		// CPU 密集型的任务，IO 密集型的任务
+		ExecutorService pool = Executors.newFixedThreadPool(4);
+		
+		// 线程数量不限
+		pool = Executors.newCachedThreadPool();
+		
+		//一个线程
+		//pool=Executors.newSingleThreadExecutor();
+		
+		//
+//		pool=Executors.newScheduledThreadPool(corePoolSize);
+
+		// 地址
+//		String baseUrl = "https://www.lagou.com/zhaopin/Python/";
+
+		// 存储职位信息的容器（List）
+		ArrayList<Job> list = new ArrayList<Job>();
+		
+		
+		System.out.println("start "+list.size());
+		
+		// 让线程池执行 30 个任务
+		for (int i = 1; i <= 10; i++) {
+//			String url = String.format("%s/%d/", baseUrl, i);
+			// %s (String), %d (Digit)
+			String url2 = String.format("http://book.kongfz.com/%s/w%d/", "Cminguo", i);
+			pool.execute(new JobSpider(url2, list));
+		}
+
+		// 关闭线程池
+		pool.shutdown();
+		
+		System.out.println("end "+list.size());
+		// 【同步】与【异步】
+		//子线程的执行是异步的
+		//主线程代码流程是同步的
+		
+		
+		// 什么时间访问 List 中的数据？？？
+		while (true) {
+			if(pool.isTerminated()){
+				//任务
+				System.out.println(list.size());
+				//写入CSV(电子表格兼容模式的文本文件)文件
+				//直接生成POI
+//				writeCSV(list);
+				
+
+				
+				break;
+			}
+			else{
+				//还有子线程在运行
+				try {
+					Thread.sleep(1000*30);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		}
+		System.out.println("over");
+
+	}
+
+	/*
+	 * 把参数中的列表数据写成CSV格式（逗号（符号）分割的格式）
+	 * 
+	 */
+	private static void writeCSV(ArrayList<Job> list) {
+		// Java IO
+		//FileWriter
+		try (FileWriter out=new FileWriter("job.csv")){
+			for(Job job:list){
+				//name,age,job,phone
+				String line=null;
+				line=String.format("%s,%s\n", job.company,job.money);
+				out.write(line);
+			}
+			out.close();
+
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		
+		
+	}
+}
