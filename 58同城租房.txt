@@ -1,9 +1,4 @@
-名字：.link
-价格：.red.price
-成品：.quality.bold.gray3
-地址:  .text.user-place
-详细信息：.normal-text
-package csuft.xia.job.v2;
+
 
 import java.io.FileWriter;
 import java.util.ArrayList;
